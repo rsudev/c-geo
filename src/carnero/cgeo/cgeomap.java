@@ -255,8 +255,6 @@ public class cgeomap extends MapActivity {
 		}
 		if (dir != null) {
 			dirUpdate.updateDir(dir);
-		}
-
 		// get parameters
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {

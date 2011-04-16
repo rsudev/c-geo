@@ -119,9 +119,6 @@ public class cgeogpxes extends ListActivity {
 		setContentView(R.layout.gpx);
 		base.setTitle(activity, res.getString(R.string.gpx_import_title));
 
-		// google analytics
-		base.sendAnal(activity, "/gpx-import");
-
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			listId = extras.getInt("list");

@@ -33,14 +33,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.Locale;
 
 public class cgeocaches extends ListActivity {
 
-	private GoogleAnalyticsTracker tracker = null;
 	private String action = null;
 	private String type = null;
 	private Double latitude = null;
@@ -352,12 +350,6 @@ public class cgeocaches extends ListActivity {
 		setContentView(R.layout.caches);
 		base.setTitle(activity, "caches");
 
-		// google analytics
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
-		tracker.dispatch();
-		base.sendAnal(activity, tracker, "/cache/list");
-
 		// get parameters
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -511,9 +503,6 @@ public class cgeocaches extends ListActivity {
 		}
 		if (geo != null) {
 			geo = app.removeGeo();
-		}
-		if (tracker != null) {
-			tracker.stop();
 		}
 
 		super.onDestroy();
@@ -835,14 +824,14 @@ public class cgeocaches extends ListActivity {
 
 			return true;
 		} else if (id == 4) { // show on external map
-			base.runExternalMap(0, activity, res, warning, tracker, cache);
+			base.runExternalMap(0, activity, res, warning, cache);
 
 			return true;
 		} else if (id == 5) { // turn-by-turn
 			if (geo != null) {
-				base.runNavigation(activity, res, settings, warning, tracker, cache.latitude, cache.longitude, geo.latitudeNow, geo.longitudeNow);
+				base.runNavigation(activity, res, settings, warning, cache.latitude, cache.longitude, geo.latitudeNow, geo.longitudeNow);
 			} else {
-				base.runNavigation(activity, res, settings, warning, tracker, cache.latitude, cache.longitude);
+				base.runNavigation(activity, res, settings, warning, cache.latitude, cache.longitude);
 			}
 
 			return true;
@@ -1095,7 +1084,6 @@ public class cgeocaches extends ListActivity {
 
 			activity.startActivity(intent);
 
-			base.sendAnal(activity, tracker, "/external/locus");
 		} catch (Exception e) {
 			// nothing
 		}

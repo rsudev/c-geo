@@ -40,9 +40,6 @@ public class cgeodate extends Dialog {
 		
 		setContentView(R.layout.date);
 
-		// google analytics
-		base.sendAnal(this.getContext(), "/date");
-
 		DatePicker picker = (DatePicker)findViewById(R.id.picker);
 		picker.init(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE), new pickerListener());
 	}

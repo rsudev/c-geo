@@ -19,7 +19,6 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -34,7 +33,6 @@ public class cgeopoint extends Activity {
 	private cgBase base = null;
 	private cgWarning warning = null;
 	private Activity activity = null;
-	private GoogleAnalyticsTracker tracker = null;
 	private cgGeo geo = null;
 	private cgUpdateLoc geoUpdate = new update();
 	private EditText latEdit = null;
@@ -63,12 +61,6 @@ public class cgeopoint extends Activity {
 		setContentView(R.layout.point);
 		base.setTitle(activity, res.getString(R.string.search_destination));
 
-		// google analytics
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
-		tracker.dispatch();
-		base.sendAnal(activity, tracker, "/point");
-
 		init();
 	}
 
@@ -90,9 +82,6 @@ public class cgeopoint extends Activity {
 	public void onDestroy() {
 		if (geo != null) {
 			geo = app.removeGeo();
-		}
-		if (tracker != null) {
-			tracker.stop();
 		}
 
 		super.onDestroy();
@@ -211,9 +200,9 @@ public class cgeopoint extends Activity {
 			return true;
 		} else if (menuItem == 4) {
 			if (geo != null) {
-				base.runNavigation(activity, res, settings, warning, tracker, coords.get(0), coords.get(1), geo.latitudeNow, geo.longitudeNow);
+				base.runNavigation(activity, res, settings, warning, coords.get(0), coords.get(1), geo.latitudeNow, geo.longitudeNow);
 			} else {
-				base.runNavigation(activity, res, settings, warning, tracker, coords.get(0), coords.get(1));
+				base.runNavigation(activity, res, settings, warning, coords.get(0), coords.get(1));
 			}
 
 			return true;
@@ -221,13 +210,13 @@ public class cgeopoint extends Activity {
 			cachesAround();
 			return true;
 		} else if (menuItem == 20) {
-			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, tracker, coords.get(0), coords.get(1)); // locus
+			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, coords.get(0), coords.get(1)); // locus
 			return true;
 		} else if (menuItem == 21) {
-			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, tracker, coords.get(0), coords.get(1)); // rmaps
+			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, coords.get(0), coords.get(1)); // rmaps
 			return true;
 		} else if (menuItem == 23) {
-			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, tracker, coords.get(0), coords.get(1)); // rmaps
+			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, coords.get(0), coords.get(1)); // rmaps
 			return true;
 		}
 

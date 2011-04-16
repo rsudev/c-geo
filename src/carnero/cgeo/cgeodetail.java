@@ -40,7 +40,6 @@ import android.view.Display;
 import android.view.SubMenu;
 import android.view.WindowManager;
 import android.widget.Button;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Locale;
@@ -53,7 +52,6 @@ public class cgeodetail extends Activity {
 	public String geocode = null;
 	public String name = null;
 	public String guid = null;
-	private GoogleAnalyticsTracker tracker = null;
 	private Resources res = null;
 	private Activity activity = null;
 	private LayoutInflater inflater = null;
@@ -274,14 +272,6 @@ public class cgeodetail extends Activity {
 			}
 		}
 
-		// google analytics
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
-		tracker.dispatch();
-		if (geocode != null) {
-			base.sendAnal(activity, tracker, "/cache/detail#" + geocode);
-		}
-
 		// no given data
 		if (geocode == null && guid == null) {
 			warning.showToast(res.getString(R.string.err_detail_cache));
@@ -330,7 +320,6 @@ public class cgeodetail extends Activity {
 		if (geo != null) {
 			geo = app.removeGeo();
 		}
-		if (tracker != null) tracker.stop();
 
 		super.onDestroy();
 	}
@@ -481,9 +470,9 @@ public class cgeodetail extends Activity {
 			return true;
 		} else if (menuItem == 9) {
 			if (geo != null) {
-				base.runNavigation(activity, res, settings, warning, tracker, cache.latitude, cache.longitude, geo.latitudeNow, geo.longitudeNow);
+				base.runNavigation(activity, res, settings, warning, cache.latitude, cache.longitude, geo.latitudeNow, geo.longitudeNow);
 			} else {
-				base.runNavigation(activity, res, settings, warning, tracker, cache.latitude, cache.longitude);
+				base.runNavigation(activity, res, settings, warning, cache.latitude, cache.longitude);
 			}
 
 			return true;
@@ -497,13 +486,13 @@ public class cgeodetail extends Activity {
 			shareCache();
 			return true;
 		} else if (menuItem == 20) {
-			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, tracker, cache); // locus
+			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, cache); // locus
 			return true;
 		} else if (menuItem == 21) {
-			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, tracker, cache); // rmaps
+			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, cache); // rmaps
 			return true;
 		} else if (menuItem == 23) {
-			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, tracker, cache); // rmaps
+			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, cache); // rmaps
 			return true;
 		}
 
@@ -554,12 +543,6 @@ public class cgeodetail extends Activity {
 
 			finish();
 			return;
-		}
-
-		if (cache.reason >= 1) {
-			base.sendAnal(activity, tracker, "/cache/detail/stored");
-		} else {
-			base.sendAnal(activity, tracker, "/cache/detail/online");
 		}
 
 		try {

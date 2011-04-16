@@ -128,13 +128,11 @@ public class cgeo extends Activity {
 			PackageManager manager = this.getPackageManager();
 			PackageInfo info = manager.getPackageInfo(this.getPackageName(), 0);
 
-			base.sendAnal(context, "/?ver=" + info.versionCode);
 			Log.i(cgSettings.tag, "Starting " + info.packageName + " " + info.versionCode + " a.k.a " + info.versionName + "...");
 
 			info = null;
 			manager = null;
 		} catch(Exception e) {
-			base.sendAnal(context, "/");
 			Log.i(cgSettings.tag, "No info.");
 		}
 

@@ -20,12 +20,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.Button;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.util.ArrayList;
 
 public class cgeowaypoint extends Activity {
 
-	private GoogleAnalyticsTracker tracker = null;
 	private cgWaypoint waypoint = null;
 	private String geocode = null;
 	private int id = -1;
@@ -125,12 +123,6 @@ public class cgeowaypoint extends Activity {
 		setContentView(R.layout.waypoint);
 		base.setTitle(activity, "waypoint");
 
-		// google analytics
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
-		tracker.dispatch();
-		base.sendAnal(activity, tracker, "/waypoint/detail");
-
 		// get parameters
 		Bundle extras = getIntent().getExtras();
 
@@ -176,9 +168,6 @@ public class cgeowaypoint extends Activity {
 	public void onDestroy() {
 		if (geo != null) {
 			geo = app.removeGeo();
-		}
-		if (tracker != null) {
-			tracker.stop();
 		}
 
 		super.onDestroy();
@@ -259,9 +248,9 @@ public class cgeowaypoint extends Activity {
 			return true;
 		} else if (menuItem == 4) {
 			if (geo != null) {
-				base.runNavigation(activity, res, settings, warning, tracker, waypoint.latitude, waypoint.longitude, geo.latitudeNow, geo.longitudeNow);
+				base.runNavigation(activity, res, settings, warning, waypoint.latitude, waypoint.longitude, geo.latitudeNow, geo.longitudeNow);
 			} else {
-				base.runNavigation(activity, res, settings, warning, tracker, waypoint.latitude, waypoint.longitude);
+				base.runNavigation(activity, res, settings, warning, waypoint.latitude, waypoint.longitude);
 			}
 
 			return true;
@@ -269,13 +258,13 @@ public class cgeowaypoint extends Activity {
 			cachesAround();
 			return true;
 		} else if (menuItem == 20) {
-			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, tracker, waypoint); // locus
+			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, waypoint); // locus
 			return true;
 		} else if (menuItem == 21) {
-			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, tracker, waypoint); // rmaps
+			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, waypoint); // rmaps
 			return true;
 		} else if (menuItem == 23) {
-			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, tracker, waypoint); // rmaps
+			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, waypoint); // rmaps
 			return true;
 		}
 

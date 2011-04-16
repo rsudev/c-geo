@@ -27,13 +27,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.util.HashMap;
 import java.util.Locale;
 
 public class cgeopopup extends Activity {
 
-	private GoogleAnalyticsTracker tracker = null;
 	private Activity activity = null;
 	private Resources res = null;
 	private cgeoapplication app = null;
@@ -131,12 +129,6 @@ public class cgeopopup extends Activity {
 		setContentView(R.layout.popup);
 		base.setTitle(activity, res.getString(R.string.detail));
 
-		// google analytics
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
-		tracker.dispatch();
-		base.sendAnal(activity, tracker, "/popup");
-
 		// get parameters
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -217,9 +209,9 @@ public class cgeopopup extends Activity {
 			return true;
 		} else if (menuItem == 4) {
 			if (geo != null) {
-				base.runNavigation(activity, res, settings, warning, tracker, cache.latitude, cache.longitude, geo.latitudeNow, geo.longitudeNow);
+				base.runNavigation(activity, res, settings, warning, cache.latitude, cache.longitude, geo.latitudeNow, geo.longitudeNow);
 			} else {
-				base.runNavigation(activity, res, settings, warning, tracker, cache.latitude, cache.longitude);
+				base.runNavigation(activity, res, settings, warning, cache.latitude, cache.longitude);
 			}
 
 			return true;
@@ -245,13 +237,13 @@ public class cgeopopup extends Activity {
 			activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.geocaching.com/seek/cache_details.aspx?wp=" + cache.geocode)));
 			return true;
 		} else if (menuItem == 20) {
-			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, tracker, cache.latitude, cache.longitude); // locus
+			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, cache.latitude, cache.longitude); // locus
 			return true;
 		} else if (menuItem == 21) {
-			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, tracker, cache.latitude, cache.longitude); // rmaps
+			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, cache.latitude, cache.longitude); // rmaps
 			return true;
 		} else if (menuItem == 23) {
-			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, tracker, cache.latitude, cache.longitude); // rmaps
+			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, cache.latitude, cache.longitude); // rmaps
 			return true;
 		}
 
@@ -563,9 +555,6 @@ public class cgeopopup extends Activity {
 	public void onDestroy() {
 		if (geo != null) {
 			geo = app.removeGeo();
-		}
-		if (tracker != null) {
-			tracker.stop();
 		}
 
 		super.onDestroy();

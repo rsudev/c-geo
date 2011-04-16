@@ -41,7 +41,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -5385,22 +5384,22 @@ public class cgBase {
 		return rmaps;
 	}
 
-	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, GoogleAnalyticsTracker tracker, Double latitude, Double longitude) {
+	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, Double latitude, Double longitude) {
 		// waypoint
-		return runExternalMap(application, activity, res, warning, tracker, null, null, latitude, longitude);
+		return runExternalMap(application, activity, res, warning, null, null, latitude, longitude);
 	}
 
-	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, GoogleAnalyticsTracker tracker, cgWaypoint waypoint) {
+	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, cgWaypoint waypoint) {
 		// waypoint
-		return runExternalMap(application, activity, res, warning, tracker, null, waypoint, null, null);
+		return runExternalMap(application, activity, res, warning, null, waypoint, null, null);
 	}
 
-	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, GoogleAnalyticsTracker tracker, cgCache cache) {
+	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, cgCache cache) {
 		// cache
-		return runExternalMap(application, activity, res, warning, tracker, cache, null, null, null);
+		return runExternalMap(application, activity, res, warning, cache, null, null, null);
 	}
 
-	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, GoogleAnalyticsTracker tracker, cgCache cache, cgWaypoint waypoint, Double latitude, Double longitude) {
+	public boolean runExternalMap(int application, Activity activity, Resources res, cgWarning warning, cgCache cache, cgWaypoint waypoint, Double latitude, Double longitude) {
 		if (cache == null && waypoint == null && latitude == null && longitude == null) {
 			return false;
 		}
@@ -5553,8 +5552,6 @@ public class cgBase {
 
 					activity.startActivity(intent);
 
-					sendAnal(activity, tracker, "/external/locus");
-
 					return true;
 				}
 			} catch (Exception e) {
@@ -5579,8 +5576,6 @@ public class cgBase {
 
 					activity.startActivity(intent);
 
-					sendAnal(activity, tracker, "/external/rmaps");
-
 					return true;
 				}
 			} catch (Exception e) {
@@ -5599,8 +5594,6 @@ public class cgBase {
 					// INFO: q parameter works with Google Maps, but breaks cooperation with all other apps
 				}
 
-				sendAnal(activity, tracker, "/external/native/maps");
-
 				return true;
 			} catch (Exception e) {
 				// nothing
@@ -5616,11 +5609,11 @@ public class cgBase {
 		return false;
 	}
 
-	public boolean runNavigation(Activity activity, Resources res, cgSettings settings, cgWarning warning, GoogleAnalyticsTracker tracker, Double latitude, Double longitude) {
-		return runNavigation(activity, res, settings, warning, tracker, latitude, longitude, null, null);
+	public boolean runNavigation(Activity activity, Resources res, cgSettings settings, cgWarning warning, Double latitude, Double longitude) {
+		return runNavigation(activity, res, settings, warning, latitude, longitude, null, null);
 	}
 
-	public boolean runNavigation(Activity activity, Resources res, cgSettings settings, cgWarning warning, GoogleAnalyticsTracker tracker, Double latitude, Double longitude, Double latitudeNow, Double longitudeNow) {
+	public boolean runNavigation(Activity activity, Resources res, cgSettings settings, cgWarning warning, Double latitude, Double longitude, Double latitudeNow, Double longitudeNow) {
 		if (activity == null) {
 			return false;
 		}
@@ -5632,8 +5625,6 @@ public class cgBase {
 		if (settings.useGNavigation == 1) {
 			try {
 				activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + latitude + "," + longitude)));
-
-				sendAnal(activity, tracker, "/external/native/navigation");
 
 				return true;
 			} catch (Exception e) {
@@ -5648,8 +5639,6 @@ public class cgBase {
 			} else {
 				activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?f=d&daddr=" + latitude + "," + longitude)));
 			}
-
-			sendAnal(activity, tracker, "/external/native/maps");
 
 			return true;
 		} catch (Exception e) {
@@ -5681,54 +5670,6 @@ public class cgBase {
 		}
 
 		return usertoken;
-	}
-
-	public void sendAnal(Context context, String page) {
-		(new sendAnalThread(context, null, page)).start();
-	}
-
-	public void sendAnal(Context context, GoogleAnalyticsTracker tracker, String page) {
-		(new sendAnalThread(context, tracker, page)).start();
-	}
-
-	private class sendAnalThread extends Thread {
-
-		Context context = null;
-		GoogleAnalyticsTracker tracker = null;
-		String page = null;
-		boolean startedHere = false;
-
-		public sendAnalThread(Context contextIn, GoogleAnalyticsTracker trackerIn, String pageIn) {
-			context = contextIn;
-			tracker = trackerIn;
-			page = pageIn;
-		}
-
-		@Override
-		public void run() {
-			try {
-				if (page == null || page.length() == 0) {
-					page = "/";
-				}
-
-				if (tracker == null && context != null) {
-					startedHere = true;
-					tracker = GoogleAnalyticsTracker.getInstance();
-					tracker.start(cgSettings.analytics, context);
-				}
-
-				tracker.trackPageView(page);
-				tracker.dispatch();
-
-				Log.i(cgSettings.tag, "Logged use of " + page);
-
-				if (startedHere == true) {
-					tracker.stop();
-				}
-			} catch (Exception e) {
-				// nothing
-			}
-		}
 	}
 
 	public Double getElevation(Double latitude, Double longitude) {
