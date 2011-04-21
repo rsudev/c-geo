@@ -18,7 +18,7 @@
 	<RelativeLayout
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent" >
-		<TextView android:id="@+id/number"
+		<TextView android:id="@+id/mfnumber"
 				android:visibility="gone"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -33,24 +33,13 @@
 				android:textSize="12dip"
 				android:textColor="@color/text_icon"
 				android:background="@drawable/icon_bcg" />
-		<!-- personal -->
-		<view class="carnero.cgeo.cgMapView" android:id="@+id/map"
+		<view class="carnero.cgeo.mfmap.MfMapView" android:id="@+id/mfmap"
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:keepScreenOn="true"
 				android:enabled="true"
-				android:clickable="true"
-				android:apiKey="0Qe1EKUGqdDOVJIf8NeX9CQngnfp6DJAxlZYQ8Q" />
- 		<!--
-		<view class="carnero.cgeo.cgMapView" android:id="@+id/map"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
-				android:keepScreenOn="true"
-				android:enabled="true"
-				android:clickable="true"
-				android:apiKey="@string/maps_api_key" />
-		-->
-		<ImageView android:id="@+id/my_position"
+				android:clickable="true" />
+		<ImageView android:id="@+id/mfmy_position"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
