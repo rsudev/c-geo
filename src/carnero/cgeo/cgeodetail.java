@@ -46,6 +46,8 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import carnero.cgeo.mfmap.MfMap;
+
 public class cgeodetail extends Activity {
 	public Long searchId = null;
 	public cgCache cache = null;
@@ -1200,7 +1202,7 @@ public class cgeodetail extends Activity {
 	}
 
 	private void showOnMap() {
-		cgeomap mapActivity = new cgeomap();
+		MfMap mapActivity = new MfMap();
 
 		Intent mapIntent = new Intent(activity, mapActivity.getClass());
 		mapIntent.putExtra("detail", true);

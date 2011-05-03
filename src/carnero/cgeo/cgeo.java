@@ -27,6 +27,8 @@ import android.widget.RelativeLayout;
 import java.util.List;
 import java.util.Locale;
 
+import carnero.cgeo.mfmap.MfMap;
+
 public class cgeo extends Activity {
 	private Resources res = null;
 	private cgeoapplication app = null;
@@ -459,7 +461,8 @@ public class cgeo extends Activity {
 
 	private class cgeoFindOnMapListener implements View.OnClickListener {
 		public void onClick(View arg0) {
-			context.startActivity(new Intent(context, cgeomap.class));
+			//context.startActivity(new Intent(context, cgeomap.class));
+			context.startActivity(new Intent(context, MfMap.class));
 		}
 	}
 

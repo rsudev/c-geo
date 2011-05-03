@@ -55,7 +55,7 @@ public class MfMap extends MapActivity {
 
 	private Resources res = null;
 	private Activity activity = null;
-	private MapView mapView = null;
+	private MfMapView mapView = null;
 	private MapController mapController = null;
 	private cgSettings settings = null;
 	private cgBase base = null;
@@ -70,7 +70,7 @@ public class MfMap extends MapActivity {
 	private boolean initLocation = true;
 	private MfMapOverlay overlay = null;
 	private cgUsersOverlay overlayUsers = null;
-	private cgOverlayScale overlayScale = null;
+	private MfOverlayScale overlayScale = null;
 	private MfMapMyOverlay overlayMyLoc = null;
 	private boolean fromDetail = false;
 	private Double oneLatitude = null;
@@ -238,7 +238,7 @@ public class MfMap extends MapActivity {
 		} else {
 			setTheme(R.style.dark);
 		}
-		setContentView(R.layout.map);
+		setContentView(R.layout.mfmap);
 		base.setTitle(activity, res.getString(R.string.map_map));
 
 		if (geo == null) {
@@ -248,7 +248,8 @@ public class MfMap extends MapActivity {
 			dir = app.startDir(activity, dirUpdate, warning);
 		}
 
-		mapView = (MapView) findViewById(R.id.mfmap);
+		mapView = (MfMapView) findViewById(R.id.mfmap);
+		mapView.setMapFile("/sdcard/mfmaps/mfmap.map");		
 		mapController = mapView.getController();
 		mapView.getOverlays().clear();
 
@@ -279,25 +280,25 @@ public class MfMap extends MapActivity {
 			initLocation = false;
 			followLocation = true;
 
-//			loadingThread = new loadCaches(loadCachesHandler, mapView);
-//			loadingThread.enable();
-//			loadingThread.start();
+			loadingThread = new loadCaches(loadCachesHandler, mapView);
+			loadingThread.enable();
+			loadingThread.start();
 
-//			myLocationInMiddle();
+			myLocationInMiddle();
 		} else if (searchId != null && searchId > 0) {
 			base.setTitle(activity, res.getString(R.string.map_map));
 			live = false;
 			initLocation = true;
 			followLocation = false;
 
-//			(new loadCacheFromDb(loadCacheFromDbHandler)).start();
+			(new loadCacheFromDb(loadCacheFromDbHandler)).start();
 		} else if (geocode != null && geocode.length() > 0) {
 			base.setTitle(activity, res.getString(R.string.map_map));
 			live = false;
 			initLocation = true;
 			followLocation = false;
 
-//			(new loadCacheFromDb(loadCacheFromDbHandler)).start();
+			(new loadCacheFromDb(loadCacheFromDbHandler)).start();
 		} else if (oneLatitude != null && oneLongitude != null) {
 			base.setTitle(activity, res.getString(R.string.map_map));
 			searchId = null;
@@ -305,40 +306,40 @@ public class MfMap extends MapActivity {
 			initLocation = true;
 			followLocation = false;
 
-//			addOverlays(true, true);
+			addOverlays(true, true);
 		}
 
 		if (myLocation == null) {
-			myLocation = (ImageView) findViewById(R.id.my_position);
+			myLocation = (ImageView) findViewById(R.id.mfmy_position);
 			if (followLocation == true) {
 				myLocation.setImageResource(R.drawable.my_location_on);
 			} else {
 				myLocation.setImageResource(R.drawable.my_location_off);
 			}
-//			myLocation.setOnClickListener(new myLocationListener());
+			myLocation.setOnClickListener(new myLocationListener());
 		}
 
-//		usersThread = new loadUsers(loadUsersHandler, mapView);
-//		if (settings.publicLoc == 1) {
-//			usersThread.enable();
-//		} else {
-//			usersThread.disable();
-//		}
-//		usersThread.start();
+		usersThread = new loadUsers(loadUsersHandler, mapView);
+		if (settings.publicLoc == 1) {
+			usersThread.enable();
+		} else {
+			usersThread.disable();
+		}
+		usersThread.start();
 
-//		if (geo != null) {
-//			geoUpdate.updateLoc(geo);
-//		}
-//		if (dir != null) {
-//			dirUpdate.updateDir(dir);
-//		}
+		if (geo != null) {
+			geoUpdate.updateLoc(geo);
+		}
+		if (dir != null) {
+			dirUpdate.updateDir(dir);
+		}
 
 		if (numberView == null) {
-			numberView = (TextView) findViewById(R.id.number);
+			numberView = (TextView) findViewById(R.id.mfnumber);
 		}
 		numberView.setClickable(true);
-//		numberView.setOnClickListener(new changeNumber());
-//		numberView.setOnLongClickListener(new resetNumber());
+		numberView.setOnClickListener(new changeNumber());
+		numberView.setOnLongClickListener(new resetNumber());
 	}
 
 
@@ -600,14 +601,14 @@ public class MfMap extends MapActivity {
 					final GeoPoint mapCenter = mapView.getMapCenter();
 					final int mapCenterLat = mapCenter.getLatitudeE6();
 					final int mapCenterLon = mapCenter.getLongitudeE6();
-//					final int mapSpanLat = mapView.getLatitudeSpan();
-//					final int mapSpanLon = mapView.getLongitudeSpan();
+					final int mapSpanLat = mapView.getLatitudeSpan();
+					final int mapSpanLon = mapView.getLongitudeSpan();
 
 					for (cgCoord coord : coordinates) {
 						if (coord.geocode != null && coord.geocode.length() > 0) {
-//							if (base.isCacheInViewPort(mapCenterLat, mapCenterLon, mapSpanLat, mapSpanLon, coord.latitude, coord.longitude) && app.isOffline(coord.geocode, null) == false) {
-//								geocodes.add(coord.geocode);
-//							}
+							if (base.isCacheInViewPort(mapCenterLat, mapCenterLon, mapSpanLat, mapSpanLon, coord.latitude, coord.longitude) && app.isOffline(coord.geocode, null) == false) {
+								geocodes.add(coord.geocode);
+							}
 						}
 					}
 				}
@@ -709,11 +710,11 @@ public class MfMap extends MapActivity {
 
 		// scale bar
 		if (overlayScale == null && mapView != null) {
-			overlayScale = new cgOverlayScale(activity, base, settings);
-//			mapView.getOverlays().add(overlayScale);
+			overlayScale = new MfOverlayScale(activity, base, settings);
+			mapView.getOverlays().add(overlayScale);
 		}
 		if (mapView.getOverlays().contains(overlayScale) == false) {
-//			mapView.getOverlays().add(overlayScale);
+			mapView.getOverlays().add(overlayScale);
 		}
 
 		mapView.invalidate();
@@ -811,10 +812,14 @@ public class MfMap extends MapActivity {
 				}
 
 				if ((canInit == true || initLocation == true) && cachesWithCoords > 0) {
-//					mapController.animateTo(new GeoPoint(centerLat, centerLon));
-//					if (Math.abs(maxLat - minLat) != 0 && Math.abs(maxLon - minLon) != 0) {
-//						mapController.zoomToSpan(Math.abs(maxLat - minLat), Math.abs(maxLon - minLon));
-//					}
+					mapController.setCenter(new GeoPoint(centerLat, centerLon));
+					if (Math.abs(maxLat - minLat) != 0 && Math.abs(maxLon - minLon) != 0) {
+						// calculate zoomlevel
+						int distDegree = Math.max(Math.abs(maxLat - minLat), Math.abs(maxLon - minLon));
+						int distPixel = Math.max(mapView.getWidth(), mapView.getHeight());
+						int zoomLevel = (int) Math.floor(Math.log(360.0/(distDegree*distPixel))/Math.log(2));
+						mapController.setZoom(zoomLevel);
+					}
 					initLocation = false;
 				}
 			}
@@ -826,7 +831,7 @@ public class MfMap extends MapActivity {
 			coord.name = "some place";
 
 			coordinates.add(coord);
-			cgOverlayItem item = new cgOverlayItem(coord);
+			MfOverlayItem item = new MfOverlayItem(coord);
 
 			final int icon = base.getIcon(false, "waypoint", false, false, false);
 			Drawable pin = null;
@@ -839,18 +844,18 @@ public class MfMap extends MapActivity {
 			}
 			item.setMarker(pin);
 
-//			overlay.updateItems(item);
+			overlay.updateItems(item);
 
 			geopoint = new GeoPoint((int) (oneLatitude * 1e6), (int) (oneLongitude * 1e6));
 
 			if (canInit == true || initLocation == true) {
-//				mapController.animateTo(geopoint);
+				mapController.setCenter(geopoint);
 				initLocation = false;
 			}
 		}
 
 		if (mapView.getOverlays().contains(overlay) == false) {
-//			mapView.getOverlays().add(overlay);
+			mapView.getOverlays().add(overlay);
 		}
 
 		mapView.invalidate();
@@ -1214,75 +1219,75 @@ public class MfMap extends MapActivity {
 			GeoPoint center = mapView.getMapCenter();
 			int latitudeCenter = center.getLatitudeE6();
 			int longitudeCenter = center.getLongitudeE6();
-//			int latitudeSpan = mapView.getLatitudeSpan();
-//			int longitudeSpan = mapView.getLongitudeSpan();
+			int latitudeSpan = ((MfMapView) mapView).getLatitudeSpan();
+			int longitudeSpan = ((MfMapView) mapView).getLongitudeSpan();
 
-//			if ((centerLatitude == null || centerLongitude == null || spanLatitude == null || spanLongitude == null) || // first run
-//					(((Math.abs(latitudeSpan - spanLatitude) > 50) || // changed zoom
-//					(Math.abs(longitudeSpan - spanLongitude) > 50) || // changed zoom
-//					(Math.abs(latitudeCenter - centerLatitude) > (latitudeSpan / 6)) || // map moved
-//					(Math.abs(longitudeCenter - centerLongitude) > (longitudeSpan / 6)) // map moved
-//					) && (base.isInViewPort(centerLatitude, centerLongitude, latitudeCenter, longitudeCenter, spanLatitude, spanLongitude, latitudeSpan, longitudeSpan) == false
-//					|| caches.isEmpty() == true))) {
-//
-//				latitudeT = (latitudeCenter + (latitudeSpan / 2) + (latitudeSpan / 10)) / 1e6;
-//				latitudeB = (latitudeCenter - (latitudeSpan / 2) - (latitudeSpan / 10)) / 1e6;
-//				longitudeL = (longitudeCenter + (longitudeSpan / 2) + (longitudeSpan / 10)) / 1e6;
-//				longitudeR = (longitudeCenter - (longitudeSpan / 2) - (longitudeSpan / 10)) / 1e6;
-//
-//				centerLatitude = latitudeCenter;
-//				centerLongitude = longitudeCenter;
-//				spanLatitude = latitudeSpan;
-//				spanLongitude = longitudeSpan;
-//
-//				if (searching == false) {
-//					searching = true;
-//					startLoading.sendEmptyMessage(0);
-//
-//					if (settings.maplive == 1) { // live map - downloads caches from gc.com
-//						if (usertoken == null) {
-//							usertoken = base.getMapUserToken();
-//						}
-//
-//						HashMap<String, String> params = new HashMap<String, String>();
-//						params.put("usertoken", usertoken);
-//						params.put("latitude-t", String.format((Locale) null, "%.6f", latitudeT));
-//						params.put("latitude-b", String.format((Locale) null, "%.6f", latitudeB));
-//						params.put("longitude-l", String.format((Locale) null, "%.6f", longitudeL));
-//						params.put("longitude-r", String.format((Locale) null, "%.6f", longitudeR));
-//
-//						Log.i(cgSettings.tag, "Starting download caches for: " + String.format((Locale) null, "%.6f", latitudeT) + "," + String.format((Locale) null, "%.6f", longitudeL) + " | " + String.format((Locale) null, "%.6f", latitudeB) + "," + String.format((Locale) null, "%.6f", longitudeR));
-//
-//						searchId = base.searchByViewport(params, 0);
-//
-//						if (searchId != null && searchId > 0) {
-//							if (loadingThread != null && app.getViewstate(searchId) != null) {
-//								loadingThread.setViewstate(app.getViewstate(searchId));
-//							}
-//
-//							caches.clear();
-//							if (app.getCount(searchId) > 0) {
-//								caches.addAll(app.getCaches(searchId, false, false, false, false, false, false));
-//							}
-//						}
-//					} else { // dead map - uses stored caches
-//						Log.i(cgSettings.tag, "Starting load offline caches for: " + String.format((Locale) null, "%.6f", latitudeT) + "," + String.format((Locale) null, "%.6f", longitudeL) + " | " + String.format((Locale) null, "%.6f", latitudeB) + "," + String.format((Locale) null, "%.6f", longitudeR));
-//
-//						searchId = app.getOfflineInViewport(latitudeT, longitudeL, latitudeB, longitudeR, settings.cacheType);
-//
-//						if (searchId != null && searchId > 0) {
-//							caches.clear();
-//							if (app.getCount(searchId) > 0) {
-//								caches.addAll(app.getCaches(searchId, false, false, false, false, false, false));
-//							}
-//						}
-//					}
-//
-//					Log.i(cgSettings.tag, "Caches found: " + caches.size());
-//
-//					handler.sendEmptyMessage(0);
-//				}
-//			}
+			if ((centerLatitude == null || centerLongitude == null || spanLatitude == null || spanLongitude == null) || // first run
+					(((Math.abs(latitudeSpan - spanLatitude) > 50) || // changed zoom
+					(Math.abs(longitudeSpan - spanLongitude) > 50) || // changed zoom
+					(Math.abs(latitudeCenter - centerLatitude) > (latitudeSpan / 6)) || // map moved
+					(Math.abs(longitudeCenter - centerLongitude) > (longitudeSpan / 6)) // map moved
+					) && (base.isInViewPort(centerLatitude, centerLongitude, latitudeCenter, longitudeCenter, spanLatitude, spanLongitude, latitudeSpan, longitudeSpan) == false
+					|| caches.isEmpty() == true))) {
+
+				latitudeT = (latitudeCenter + (latitudeSpan / 2) + (latitudeSpan / 10)) / 1e6;
+				latitudeB = (latitudeCenter - (latitudeSpan / 2) - (latitudeSpan / 10)) / 1e6;
+				longitudeL = (longitudeCenter + (longitudeSpan / 2) + (longitudeSpan / 10)) / 1e6;
+				longitudeR = (longitudeCenter - (longitudeSpan / 2) - (longitudeSpan / 10)) / 1e6;
+
+				centerLatitude = latitudeCenter;
+				centerLongitude = longitudeCenter;
+				spanLatitude = latitudeSpan;
+				spanLongitude = longitudeSpan;
+
+				if (searching == false) {
+					searching = true;
+					startLoading.sendEmptyMessage(0);
+
+					if (settings.maplive == 1) { // live map - downloads caches from gc.com
+						if (usertoken == null) {
+							usertoken = base.getMapUserToken();
+						}
+
+						HashMap<String, String> params = new HashMap<String, String>();
+						params.put("usertoken", usertoken);
+						params.put("latitude-t", String.format((Locale) null, "%.6f", latitudeT));
+						params.put("latitude-b", String.format((Locale) null, "%.6f", latitudeB));
+						params.put("longitude-l", String.format((Locale) null, "%.6f", longitudeL));
+						params.put("longitude-r", String.format((Locale) null, "%.6f", longitudeR));
+
+						Log.i(cgSettings.tag, "Starting download caches for: " + String.format((Locale) null, "%.6f", latitudeT) + "," + String.format((Locale) null, "%.6f", longitudeL) + " | " + String.format((Locale) null, "%.6f", latitudeB) + "," + String.format((Locale) null, "%.6f", longitudeR));
+
+						searchId = base.searchByViewport(params, 0);
+
+						if (searchId != null && searchId > 0) {
+							if (loadingThread != null && app.getViewstate(searchId) != null) {
+								loadingThread.setViewstate(app.getViewstate(searchId));
+							}
+
+							caches.clear();
+							if (app.getCount(searchId) > 0) {
+								caches.addAll(app.getCaches(searchId, false, false, false, false, false, false));
+							}
+						}
+					} else { // dead map - uses stored caches
+						Log.i(cgSettings.tag, "Starting load offline caches for: " + String.format((Locale) null, "%.6f", latitudeT) + "," + String.format((Locale) null, "%.6f", longitudeL) + " | " + String.format((Locale) null, "%.6f", latitudeB) + "," + String.format((Locale) null, "%.6f", longitudeR));
+
+						searchId = app.getOfflineInViewport(latitudeT, longitudeL, latitudeB, longitudeR, settings.cacheType);
+
+						if (searchId != null && searchId > 0) {
+							caches.clear();
+							if (app.getCount(searchId) > 0) {
+								caches.addAll(app.getCaches(searchId, false, false, false, false, false, false));
+							}
+						}
+					}
+
+					Log.i(cgSettings.tag, "Caches found: " + caches.size());
+
+					handler.sendEmptyMessage(0);
+				}
+			}
 		}
 	}
 

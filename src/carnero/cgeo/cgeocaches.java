@@ -37,6 +37,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.Locale;
 
+import carnero.cgeo.mfmap.MfMap;
+
 public class cgeocaches extends ListActivity {
 
 	private String action = null;
@@ -995,7 +997,7 @@ public class cgeocaches extends ListActivity {
 			return;
 		}
 
-		cgeomap mapActivity = new cgeomap();
+		MfMap mapActivity = new MfMap();
 
 		Intent mapIntent = new Intent(activity, mapActivity.getClass());
 		mapIntent.putExtra("detail", false);
