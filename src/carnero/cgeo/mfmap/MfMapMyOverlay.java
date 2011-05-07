@@ -6,10 +6,12 @@ import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.Overlay;
 import org.mapsforge.android.maps.Projection;
 
+import carnero.cgeo.R;
 import carnero.cgeo.cgBase;
 import carnero.cgeo.cgSettings;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
@@ -164,21 +166,21 @@ public class MfMapMyOverlay extends Overlay {
 			}
 		}
 
-//		if (arrow == null) {
-//			arrow = BitmapFactory.decodeResource(mapView.getContext().getResources(), R.drawable.my_location_chevron);
-//			widthArrow = arrow.getWidth();
-//			heightArrow = arrow.getHeight();
-//		}
-//
-//		int marginLeft;
-//		int marginTop;
-//
-//		marginLeft = center.x - (widthArrow / 2);
-//		marginTop = center.y - (heightArrow / 2);
-//
-//		canvas.rotate(new Float(heading), center.x, center.y);
-//		canvas.drawBitmap(arrow, marginLeft, marginTop, null);
-//		canvas.rotate(-(new Float(heading)), center.x, center.y);
+		if (arrow == null) {
+			arrow = BitmapFactory.decodeResource(settings.getContext().getResources(), R.drawable.my_location_chevron);
+			widthArrow = arrow.getWidth();
+			heightArrow = arrow.getHeight();
+		}
+
+		int marginLeft;
+		int marginTop;
+
+		marginLeft = center.x - (widthArrow / 2);
+		marginTop = center.y - (heightArrow / 2);
+
+		canvas.rotate(new Float(heading), center.x, center.y);
+		canvas.drawBitmap(arrow, marginLeft, marginTop, null);
+		canvas.rotate(-(new Float(heading)), center.x, center.y);
 
 		canvas.setDrawFilter(remfil);
     }

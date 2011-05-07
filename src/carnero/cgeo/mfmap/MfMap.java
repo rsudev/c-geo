@@ -80,7 +80,7 @@ public class MfMap extends MapActivity {
 	private volatile long downloadThreadRun = 0l;
 	// overlays
 	private MfMapOverlay overlayCaches = null;
-//	private cgUsersOverlay overlayUsers = null;
+	private MfUsersOverlay overlayUsers = null;
 	private MfOverlayScale overlayScale = null;
 	private MfMapMyOverlay overlayMyLoc = null;
 	// data for overlays
