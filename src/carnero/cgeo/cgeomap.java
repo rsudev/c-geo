@@ -255,6 +255,7 @@ public class cgeomap extends MapActivity {
 		}
 		if (dir != null) {
 			dirUpdate.updateDir(dir);
+		}
 		// get parameters
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -285,12 +286,8 @@ public class cgeomap extends MapActivity {
 		
 		// google analytics
 		if (live) {
-			base.sendAnal(activity, "/map/live");
-
 			followMyLocation = true;
 		} else {
-			base.sendAnal(activity, "/map/normal");
-
 			followMyLocation = false;
 			
 			if (searchIdIntent != null || (latitudeIntent != null && longitudeIntent != null)) {
