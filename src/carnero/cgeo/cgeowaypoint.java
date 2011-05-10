@@ -278,7 +278,7 @@ public class cgeowaypoint extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 		
-		MfMap mapActivity = new MfMap();
+		Intent mapIntent = new Intent(activity, MfMap.class);
 		mapIntent.putExtra("latitude", waypoint.latitude);
 		mapIntent.putExtra("longitude", waypoint.longitude);
 		mapIntent.putExtra("wpttype", waypoint.type);

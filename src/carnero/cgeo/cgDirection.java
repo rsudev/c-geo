@@ -67,7 +67,7 @@ public class cgDirection {
 	private class cgeoSensorListener implements SensorEventListener {
 		@Override
 		 public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			Log.i(cgSettings.tag, "Compass' accuracy is low (" + accuracy + ")");
+//			Log.i(cgSettings.tag, "Compass' accuracy is low (" + accuracy + ")");
 		 }
 
 		@Override
