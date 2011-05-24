@@ -113,6 +113,7 @@ public class cgBase {
 	private SharedPreferences prefs = null;
 	public String version = null;
 	private String idBrowser = "Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.86 Safari/533.4";
+	private Context context = null;
 	final private static HashMap<String, Integer> gcIcons = new HashMap<String, Integer>();
 	final private static HashMap<String, Integer> wpIcons = new HashMap<String, Integer>();
 
@@ -139,6 +140,7 @@ public class cgBase {
 	public static final int LOG_ANNOUNCEMENT = 74;
 
 	public cgBase(cgeoapplication appIn, cgSettings settingsIn, SharedPreferences prefsIn) {
+		context = appIn.getBaseContext();
 		res = appIn.getBaseContext().getResources();
 
 		// cache types
@@ -1088,7 +1090,7 @@ public class cgBase {
 		final Pattern patternLogs = Pattern.compile("<table class=\"LogsTable[^\"]*\"[^>]*>[^<]*<tr>(.*)</tr>[^<]*</table>[^<]*<p", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 		final Pattern patternLog = Pattern.compile("<td[^>]*>[^<]*<strong>[^<]*<img src=\"[^\"]*/images/icons/([^\\.]+)\\.[a-z]{2,5}\"[^>]*>&nbsp;([a-zA-Z]+) (\\d+)(, (\\d+))? by <a href=[^>]+>([^<]+)</a>[<^]*</strong>([^\\(]*\\((\\d+) found\\))?(<br[^>]*>)+((?:(?!<small>).)*)(<br[^>]*>)+<small>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 		final Pattern patternAttributes = Pattern.compile("<h3 class=\"WidgetHeader\">[^<]*<img[^>]+>[^\\w]*Attributes[^<]*</h3>[^<]*<div class=\"WidgetBody\">(([^<]*<img src=\"[^\"]+\" alt=\"[^\"]+\"[^>]*>)+)[^<]*<p", Pattern.CASE_INSENSITIVE);
-		final Pattern patternAttributesInside = Pattern.compile("[^<]*<img src=\"[^\"]+\" alt=\"([^\"]+)\"[^>]*>", Pattern.CASE_INSENSITIVE);
+		final Pattern patternAttributesInside = Pattern.compile("[^<]*<img src=\"([^\"]+)\" alt=\"([^\"]+)\"[^>]*>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternSpoilers = Pattern.compile("<span id=\"ctl00_ContentBody_Images\">((<a href=\"[^\"]+\"[^>]*>[^<]*<img[^>]+>[^<]*<span>[^>]+</span>[^<]*</a>[^<]*<br[^>]*>([^<]*(<br[^>]*>)+)?)+)[^<]*</span>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternSpoilersInside = Pattern.compile("[^<]*<a href=\"([^\"]+)\"[^>]*>[^<]*<img[^>]+>[^<]*<span>([^>]+)</span>[^<]*</a>[^<]*<br[^>]*>(([^<]*)(<br[^<]*>)+)?", Pattern.CASE_INSENSITIVE);
 		final Pattern patternInventory = Pattern.compile("<span id=\"ctl00_ContentBody_uxTravelBugList_uxInventoryLabel\">[^\\w]*Inventory[^<]*</span>[^<]*</h3>[^<]*<div class=\"WidgetBody\">([^<]*<ul>(([^<]*<li>[^<]*<a href=\"[^\"]+\"[^>]*>[^<]*<img src=\"[^\"]+\"[^>]*>[^<]*<span>[^<]+<\\/span>[^<]*<\\/a>[^<]*<\\/li>)+)[^<]*<\\/ul>)?", Pattern.CASE_INSENSITIVE);
@@ -1467,11 +1469,30 @@ public class cgBase {
 					final Matcher matcherAttributesInside = patternAttributesInside.matcher(attributesPre);
 
 					while (matcherAttributesInside.find()) {
-						if (matcherAttributesInside.groupCount() > 0 && matcherAttributesInside.group(1).equalsIgnoreCase("blank") != true) {
+						if (matcherAttributesInside.groupCount() > 1 && matcherAttributesInside.group(2).equalsIgnoreCase("blank") != true) {
 							if (cache.attributes == null) {
 								cache.attributes = new ArrayList<String>();
 							}
-							cache.attributes.add(matcherAttributesInside.group(1).toLowerCase());
+							// by default, use the tooltip of the attribute
+							String attribute = matcherAttributesInside.group(2).toLowerCase();
+
+							// now try to find a translation for the attribute
+							String imageName = matcherAttributesInside.group(1).trim();
+							if (!(imageName.length() == 0)) {
+								int start = imageName.lastIndexOf('/');
+								int end = imageName.lastIndexOf('.');
+								if (start >= 0 && end>= 0) {
+									imageName = imageName.substring(start + 1, end).replace('-', '_');
+								    int id = res.getIdentifier("attribute_" + imageName, "string", context.getPackageName());
+								    if (id > 0) {
+								    	String translated = res.getString(id);
+								    	if (translated != null && !(translated.length() == 0)) {
+								    		attribute = translated;
+								    	}
+								    }
+								}
+							}
+							cache.attributes.add(attribute );
 						}
 					}
 				}
@@ -3724,9 +3745,6 @@ public class cgBase {
 					ctl = Integer.toString(tb.ctl);
 				}
 
-				// params.put("ctl00$ContentBody$LogBookPanel1$uxTrackables$repTravelBugs$ctl" + ctl + "$ddlAction", action);
-				// ^^ is this important?
-				
 				if (tb.action > 0) {
 					hdnSelected.append(action);
 					hdnSelected.append(",");
@@ -3810,7 +3828,7 @@ public class cgBase {
 		}
 
 		try {
-			final Pattern patternOk = Pattern.compile("<h2[^>]*>[^<]*<span id=\"ctl00_ContentBody_lbHeading\"[^>]*>[^<]*</span>[^<]*</h2>", Pattern.CASE_INSENSITIVE);
+			final Pattern patternOk = Pattern.compile("<h2[^>]*>[^<]*<span id=\"ctl00_ContentBody_lbHeading\"[^>]*>[^<]*</span>[^<]*</h2>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 			final Matcher matcherOk = patternOk.matcher(page);
 			if (matcherOk.find() == true) {
 				Log.i(cgSettings.tag, "Log successfully posted to cache #" + cacheid);
@@ -4321,7 +4339,7 @@ public class cgBase {
 			}
 		}
 
-		if (cookies != null) {
+		if (cookies != null && !cookies.isEmpty()) {
 			final Object[] keys = cookies.keySet().toArray();
 			final ArrayList<String> cookiesEncoded = new ArrayList<String>();
 
@@ -4879,28 +4897,26 @@ public class cgBase {
 	}
 
 	public static String rot13(String text) {
-		final String xlr13 = "abcdefghijklmnopqrstuvwxyzabcdefghijklmABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLM";
-		final StringBuilder progress = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
+		// plaintext flag (do not convert)
+		boolean plaintext = false;
 
-		//  plaintext flag (do not convert)
-		Boolean pt = false;
-
-		int len = text.length();
-		for (int z = 0; z < len; z++) {
-			Character c = text.charAt(z);
+		int length = text.length();
+		for (int index = 0; index < length; index++) {
+			int c = text.charAt(index);
 			if (c == '[') {
-				pt = true;
+				plaintext = true;
 			} else if (c == ']') {
-				pt = false;
-			} else {
-				int idx = xlr13.indexOf(c);
-				if (idx >= 0 && !pt) {
-					c = xlr13.charAt(idx + 13);
-				}
+				plaintext = false;
+			} else if (!plaintext) {
+				int capitalized = c & 32;
+				c &= ~capitalized;
+				c = ((c >= 'A') && (c <= 'Z') ? ((c - 'A' + 13) % 26 + 'A') : c)
+						| capitalized;
 			}
-			progress.append(c);
+			result.append((char) c);
 		}
-		return progress.toString();
+		return result.toString();
 	}
 
 	public static String md5(String text) {
@@ -4991,6 +5007,10 @@ public class cgBase {
 			}
 
 			if (cache == null) {
+				if (handler != null) {
+					handler.sendMessage(new Message());
+				}
+				
 				return;
 			}
 			
@@ -5459,19 +5479,19 @@ public class cgBase {
 					}
 
 					// name
-					if (cache != null && cache.geocode != null && cache.geocode.length() > 0) {
-						dos.writeUTF(cache.geocode.toUpperCase());
-					} else if (waypoint != null && waypoint.lookup != null && waypoint.lookup.length() > 0) {
-						dos.writeUTF(waypoint.lookup.toUpperCase());
+					if (cache != null && cache.name != null && cache.name.length() > 0) {
+						dos.writeUTF(cache.name);
+					} else if (waypoint != null && waypoint.name != null && waypoint.name.length() > 0) {
+						dos.writeUTF(waypoint.name);
 					} else {
 						dos.writeUTF("");
 					}
 
 					// description
-					if (cache != null && cache.name != null && cache.name.length() > 0) {
-						dos.writeUTF(cache.name);
-					} else if (waypoint != null && waypoint.name != null && waypoint.name.length() > 0) {
-						dos.writeUTF(waypoint.name);
+					if (cache != null && cache.geocode != null && cache.geocode.length() > 0) {
+						dos.writeUTF(cache.geocode.toUpperCase());
+					} else if (waypoint != null && waypoint.lookup != null && waypoint.lookup.length() > 0) {
+						dos.writeUTF(waypoint.lookup.toUpperCase());
 					} else {
 						dos.writeUTF("");
 					}
@@ -5624,7 +5644,7 @@ public class cgBase {
 		// Google Navigation
 		if (settings.useGNavigation == 1) {
 			try {
-				activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + latitude + "," + longitude)));
+				activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:ll=" + latitude + "," + longitude)));
 
 				return true;
 			} catch (Exception e) {
