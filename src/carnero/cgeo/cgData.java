@@ -2587,6 +2587,8 @@ public class cgData {
 
 				geocodes.clear();
 			}
+			
+			databaseRW.execSQL("delete from " + dbTableCaches + " where geocode = \"\"");
 
 			final SQLiteStatement countSql = databaseRO.compileStatement("select count(_id) from " + dbTableCaches + " where reason = 0");
 			final int count = (int) countSql.simpleQueryForLong();
